@@ -24,9 +24,6 @@ pub fn check_type(command: &str, built_in_commands: &HashSet<&str>) -> io::Resul
     if let Some(paths) = env::var_os("PATH") {
         for path_buf in std::env::split_paths(&paths) {
             let p = path_buf.as_path();
-            if command == "my_exe" {
-                println!("Path: {}", p.display());
-            }
             if p.is_file() && is_command_at_path(command, &p) {
                 return Ok(());
             }
@@ -35,9 +32,6 @@ pub fn check_type(command: &str, built_in_commands: &HashSet<&str>) -> io::Resul
                 for entry in fs::read_dir(p)? {
                     let entry = entry?;
                     let path = entry.path();
-                    if command == "my_exe" {
-                        println!("\t\t SubPath: {}", path.display());
-                    }
                     
                     if is_command_at_path(command, &path) {
                         return Ok(());
