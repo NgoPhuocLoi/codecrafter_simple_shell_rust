@@ -32,7 +32,7 @@ fn main() {
                 if is_built_in {
                     println!("{remainder} is a shell builtin");
                 } else {
-                    println!("{remainder}: command not found");
+                    println!("{remainder}: not found");
                 }
             }
             other => {
