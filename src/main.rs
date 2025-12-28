@@ -30,7 +30,7 @@ fn main() {
             "type" => {
                 let is_built_in = built_in_commands.contains(&remainder);
                 if is_built_in {
-                    println!("{command} is a shell builtin");
+                    println!("{remainder} is a shell builtin");
                 } else {
                     println!("{remainder}: command not found");
                 }
