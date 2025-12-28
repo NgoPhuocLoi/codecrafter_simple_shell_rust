@@ -1,7 +1,7 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
 use std::collections::HashSet;
-use crate::builtin::{echo::echo, check_type::check_type};
+use crate::builtin::{echo::echo, check_type::check_type, execute_command::execute_command};
 
 mod builtin;
 
@@ -30,10 +30,10 @@ fn main() {
                 echo(remainder);
             },
             "type" => {
-                let _ = check_type(remainder, &built_in_commands);
+                check_type(remainder, &built_in_commands);
             }
             other => {
-                println!("{}: command not found", other);
+                execute_command(other, remainder);
             }
         }
     }
