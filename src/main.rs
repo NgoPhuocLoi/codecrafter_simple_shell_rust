@@ -1,11 +1,13 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
 use std::collections::HashSet;
+use crate::builtin::{echo::echo, check_type::check_type};
+
+mod builtin;
 
 fn main() {
     // TODO: Uncomment the code below to pass the first stage
     let built_in_commands = HashSet::from(["echo", "type", "exit"]);
-
     loop {
         print!("$ ");
         io::stdout().flush().unwrap();
@@ -25,15 +27,10 @@ fn main() {
                 return;
             },
             "echo" => {
-                println!("{remainder}");
+                echo(remainder);
             },
             "type" => {
-                let is_built_in = built_in_commands.contains(&remainder);
-                if is_built_in {
-                    println!("{remainder} is a shell builtin");
-                } else {
-                    println!("{remainder}: not found");
-                }
+                let _ = check_type(remainder, &built_in_commands);
             }
             other => {
                 println!("{}: command not found", other);
