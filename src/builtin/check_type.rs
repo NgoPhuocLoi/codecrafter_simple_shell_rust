@@ -24,7 +24,7 @@ pub fn check_type(command: &str, built_in_commands: &HashSet<&str>) -> io::Resul
 
     for path_buf in std::env::split_paths(&paths) {
         let p = path_buf.as_path();
-
+        println!("Path: {}", p.display());
         if p.is_file() && is_command_at_path(command, &p) {
             return Ok(());
         }
@@ -33,6 +33,7 @@ pub fn check_type(command: &str, built_in_commands: &HashSet<&str>) -> io::Resul
             for entry in fs::read_dir(p)? {
                 let entry = entry?;
                 let path = entry.path();
+                println!("\t\t SubPath: {}", path.display());
                 if is_command_at_path(command, &path) {
                     return Ok(());
                 }
