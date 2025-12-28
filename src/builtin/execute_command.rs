@@ -6,7 +6,7 @@ pub fn execute_command(command: &str, remainder: &str) {
     match find_executable_path(command) {
         Some(_) => {
             let output = Command::new(command)
-                                .arg(remainder)
+                                .args(remainder.split(" "))
                                 .output()
                                 .expect("Failed to execute command");
             io::stdout().write_all(&output.stdout).expect(" Failed");
