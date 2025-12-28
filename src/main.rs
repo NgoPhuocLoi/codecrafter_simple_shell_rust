@@ -9,12 +9,24 @@ fn main() {
 
         let mut input = String::new();
         io::stdin().read_line(&mut input).unwrap();
-        let command = input.trim();
+        let mut command = input.trim();
+        let mut remainder = "";
 
-        if command == "exit" {
-            return;
+        if let Some(index) = command.find(" ") {
+            remainder = &command[index+1..];
+            command = &command[..index];
         }
 
-        println!("{}: command not found", command);
+        match command {
+            "exit" => {
+                return;
+            },
+            "echo" => {
+                println!("{remainder}");
+            },
+            other => {
+                println!("{}: command not found", other)
+            }
+        }
     }
 }
