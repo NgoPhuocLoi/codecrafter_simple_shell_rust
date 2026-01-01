@@ -6,7 +6,7 @@ pub fn execute_command(command: &str, args: Vec<String>) {
     match find_executable_path(command) {
         Some(_) => {
             let output = Command::new(command)
-                .args(args)
+                .args(args.iter().filter(|&i| i != " "))
                 .output()
                 .expect("Failed to execute command");
             io::stdout().write_all(&output.stdout).expect(" Failed");

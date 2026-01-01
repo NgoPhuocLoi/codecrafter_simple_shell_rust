@@ -27,7 +27,7 @@ fn normalize_arg_str(arg_str: &str) -> Vec<String> {
                 args[i].to_string()
             }
         })
-        .filter(|i| i.trim() != "")
+        .filter(|i| i.trim_matches(|c: char| c.is_whitespace() && c != ' ') != "")
         .collect()
 }
 

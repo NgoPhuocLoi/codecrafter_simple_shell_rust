@@ -1,5 +1,4 @@
 use is_executable::IsExecutable;
-use std::collections::HashSet;
 use std::env;
 use std::fs;
 use std::path::Path;
@@ -35,15 +34,15 @@ pub fn find_executable_path(command: &str) -> Option<PathBuf> {
     None
 }
 
-pub fn check_type(command: &str, built_in_commands: &HashSet<&str>) {
-    let is_built_in = built_in_commands.contains(&command);
-    if is_built_in {
-        println!("{command} is a shell builtin");
-        return;
-    }
+// pub fn check_type(command: &str, built_in_commands: &HashSet<&str>) {
+//     let is_built_in = built_in_commands.contains(&command);
+//     if is_built_in {
+//         println!("{command} is a shell builtin");
+//         return;
+//     }
 
-    match find_executable_path(command) {
-        Some(path) => println!("{}", path.display()),
-        None => println!("{}: not found", command),
-    }
-}
+//     match find_executable_path(command) {
+//         Some(path) => println!("{}", path.display()),
+//         None => println!("{}: not found", command),
+//     }
+// }
