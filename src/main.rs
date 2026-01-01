@@ -31,6 +31,10 @@ fn normalize_arg_str(arg_str: &str) -> Vec<String> {
         .collect()
 }
 
+fn get_args_from_arg_string(arg_str: &str) -> Vec<String> {
+    shlex::split(arg_str).unwrap()
+}
+
 fn main() {
     // TODO: Uncomment the code below to pass the first stage
     loop {
@@ -47,7 +51,7 @@ fn main() {
             command = &command[..index];
         }
 
-        let args = normalize_arg_str(remainder);
+        let args = get_args_from_arg_string(remainder);
 
         match command {
             "exit" => {
