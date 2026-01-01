@@ -4,27 +4,6 @@ use std::io::{self, Write};
 
 mod builtin;
 
-fn normalize_arg_str(arg_str: &str) -> Vec<String> {
-    let args: Vec<&str> = arg_str.split("'").collect();
-    let l = args.len();
-
-    args.iter()
-        .enumerate()
-        .map(|(i, _)| {
-            let is_first_agr = i == 0 && args[i] != "";
-            let is_last_agr = i == l - 1 && args[l - 1] != "";
-            let is_middle_agr =
-                i > 1 && i < l - 1 && args[i] != "" && args[i - 1] == "" && args[i + 1] == "";
-            if is_first_agr || is_last_agr || is_middle_agr {
-                remove_redundant_spaces(args[i])
-            } else {
-                args[i].to_string()
-            }
-        })
-        .filter(|i| i.trim_matches(|c: char| c.is_whitespace() && c != ' ') != "")
-        .collect()
-}
-
 fn get_args_from_arg_string(arg_str: &str) -> Vec<String> {
     shlex::split(arg_str).unwrap()
 }
