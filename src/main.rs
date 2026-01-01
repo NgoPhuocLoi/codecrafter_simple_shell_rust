@@ -4,12 +4,6 @@ use std::io::{self, Write};
 
 mod builtin;
 
-// .filter(|i| i.trim() != "")
-
-fn remove_redundant_spaces(s: &str) -> String {
-    s.split_whitespace().collect::<Vec<&str>>().join(" ")
-}
-
 fn normalize_arg_str(arg_str: &str) -> Vec<String> {
     let args: Vec<&str> = arg_str.split("'").collect();
     let l = args.len();
