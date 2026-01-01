@@ -57,9 +57,9 @@ fn main() {
             "exit" => {
                 return;
             }
-            "echo" => {
-                echo(args);
-            }
+            // "echo" => {
+            //     echo(args);
+            // }
             // "type" => {
             //     check_type(remainder, &built_in_commands);
             // }
