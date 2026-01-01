@@ -1,4 +1,3 @@
-
-pub fn echo(str: &str) {
-    println!("{str}");
+pub fn echo(args: Vec<String>) {
+    println!("{}", args.join(""));
 }

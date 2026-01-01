@@ -1,13 +1,38 @@
+use crate::builtin::{echo::echo, execute_command::execute_command};
 #[allow(unused_imports)]
 use std::io::{self, Write};
-use std::collections::HashSet;
-use crate::builtin::{echo::echo, check_type::check_type, execute_command::execute_command};
 
 mod builtin;
 
+// .filter(|i| i.trim() != "")
+
+fn remove_redundant_spaces(s: &str) -> String {
+    s.split_whitespace().collect::<Vec<&str>>().join(" ")
+}
+
+fn normalize_arg_str(arg_str: &str) -> Vec<String> {
+    let args: Vec<&str> = arg_str.split("'").collect();
+    let l = args.len();
+
+    args.iter()
+        .enumerate()
+        .map(|(i, _)| {
+            let is_first_agr = i == 0 && args[i] != "";
+            let is_last_agr = i == l - 1 && args[l - 1] != "";
+            let is_middle_agr =
+                i > 1 && i < l - 1 && args[i] != "" && args[i - 1] == "" && args[i + 1] == "";
+            if is_first_agr || is_last_agr || is_middle_agr {
+                remove_redundant_spaces(args[i])
+            } else {
+                args[i].to_string()
+            }
+        })
+        .filter(|i| i.trim() != "")
+        .collect()
+}
+
 fn main() {
     // TODO: Uncomment the code below to pass the first stage
-    let built_in_commands = HashSet::from(["echo", "type", "exit"]);
     loop {
         print!("$ ");
         io::stdout().flush().unwrap();
@@ -18,22 +43,24 @@ fn main() {
         let mut remainder = "";
 
         if let Some(index) = command.find(" ") {
-            remainder = &command[index+1..];
+            remainder = &command[index + 1..];
             command = &command[..index];
         }
+
+        let args = normalize_arg_str(remainder);
 
         match command {
             "exit" => {
                 return;
-            },
-            "echo" => {
-                echo(remainder);
-            },
-            "type" => {
-                check_type(remainder, &built_in_commands);
             }
+            "echo" => {
+                echo(args);
+            }
+            // "type" => {
+            //     check_type(remainder, &built_in_commands);
+            // }
             other => {
-                execute_command(other, remainder);
+                execute_command(other, args);
             }
         }
     }
