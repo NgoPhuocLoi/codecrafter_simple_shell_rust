@@ -1,4 +1,4 @@
-use crate::builtin::{check_type::check_type, echo::echo, execute_command::execute_command};
+use crate::builtin::{check_type::check_type, execute_command::execute_command};
 use std::collections::HashSet;
 #[allow(unused_imports)]
 use std::io::{self, Write};
@@ -20,12 +20,28 @@ fn main() {
         let mut command = input.trim();
         let mut remainder = "";
 
-        if let Some(index) = command.find(" ") {
-            remainder = &command[index + 1..];
-            command = &command[..index];
+        let first_char = &command[..1];
+
+        match first_char {
+            "'" => {
+                let i = &command[1..].find("'").unwrap() + 1;
+                remainder = &command[i + 1..];
+                command = &command[1..i];
+            }
+            "\"" => {
+                let i = &command[1..].find("\"").unwrap() + 1;
+                remainder = &command[i + 1..];
+                command = &command[1..i];
+            }
+            _ => {
+                if let Some(index) = command.find(" ") {
+                    remainder = &command[index + 1..];
+                    command = &command[..index];
+                }
+            }
         }
 
-        let args = get_args_from_arg_string(remainder);
+        let args = get_args_from_arg_string(remainder.trim());
 
         match command {
             "exit" => {
