@@ -1,4 +1,5 @@
-use crate::builtin::{echo::echo, execute_command::execute_command};
+use crate::builtin::{check_type::check_type, echo::echo, execute_command::execute_command};
+use std::collections::HashSet;
 #[allow(unused_imports)]
 use std::io::{self, Write};
 
@@ -33,9 +34,10 @@ fn main() {
             // "echo" => {
             //     echo(args);
             // }
-            // "type" => {
-            //     check_type(remainder, &built_in_commands);
-            // }
+            "type" => {
+                let built_in_commands = HashSet::from(["echo", "type", "exit"]);
+                check_type(remainder, &built_in_commands);
+            }
             other => {
                 execute_command(other, args);
             }
