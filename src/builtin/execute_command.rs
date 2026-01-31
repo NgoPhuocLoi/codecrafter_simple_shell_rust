@@ -43,7 +43,7 @@ pub fn execute_command(command: &str, args: Vec<String>) {
 
             if !is_redirect_stdout {
                 io::stdout().write_all(&output.stdout).expect(" Failed");
-            } else if redirected_file_path != "" && output.stdout.len() > 0 {
+            } else if is_redirect_stdout && redirected_file_path != "" {
                 let p = Path::new(redirected_file_path);
                 match fs::OpenOptions::new().write(true).open(p) {
                     Ok(mut f) => {
@@ -58,7 +58,7 @@ pub fn execute_command(command: &str, args: Vec<String>) {
 
             if !is_redirect_stderr {
                 io::stderr().write_all(&output.stderr).expect(" Failed");
-            } else if redirected_file_path != "" && output.stderr.len() > 0 {
+            } else if is_redirect_stderr && redirected_file_path != "" {
                 let p = Path::new(redirected_file_path);
                 match fs::OpenOptions::new().write(true).open(p) {
                     Ok(mut f) => {
