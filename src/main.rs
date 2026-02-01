@@ -20,7 +20,11 @@ fn main() {
         let mut command = input.trim();
         let mut remainder = "";
 
-        let first_char = &command[..1];
+        let mut first_char = "";
+
+        if command.len() > 1 {
+            first_char = &command[..1].trim();
+        }
 
         match first_char {
             "'" => {
@@ -47,13 +51,11 @@ fn main() {
             "exit" => {
                 return;
             }
-            // "echo" => {
-            //     echo(args);
-            // }
             "type" => {
                 let built_in_commands = HashSet::from(["echo", "type", "exit"]);
                 check_type(remainder, &built_in_commands);
             }
+            "" => {}
             other => {
                 execute_command(other, args);
             }
