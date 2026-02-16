@@ -1,7 +1,11 @@
+use rustyline::completion::{Completer, Pair};
+use rustyline::error::ReadlineError;
+use rustyline::{Context, DefaultEditor, Editor, Helper};
+
 use crate::builtin::{check_type::check_type, execute_command::execute_command};
-use std::collections::HashSet;
 #[allow(unused_imports)]
 use std::io::{self, Write};
+use std::{collections::HashSet, io::Read};
 
 mod builtin;
 
@@ -9,14 +13,45 @@ fn get_args_from_arg_string(arg_str: &str) -> Vec<String> {
     shlex::split(arg_str).unwrap()
 }
 
+struct MyHelper;
+impl rustyline::validate::Validator for MyHelper {}
+impl rustyline::hint::Hinter for MyHelper {
+    type Hint = String;
+}
+impl rustyline::highlight::Highlighter for MyHelper {}
+impl Helper for MyHelper {}
+impl Completer for MyHelper {
+    type Candidate = Pair;
+
+    fn complete(
+        &self, // FIXME should be `&mut self`
+        line: &str,
+        pos: usize,
+        ctx: &Context<'_>,
+    ) -> Result<(usize, Vec<Self::Candidate>), ReadlineError> {
+        let commands = vec!["echo", "exit"];
+        let mut candidates = vec![];
+
+        for cmd in commands {
+            if cmd.starts_with(&line[..pos]) {
+                candidates.push(Pair {
+                    display: format!("{cmd} "),
+                    replacement: format!("{cmd} "),
+                })
+            }
+        }
+        Ok((0, candidates))
+    }
+}
+
 fn main() {
     // TODO: Uncomment the code below to pass the first stage
-    loop {
-        print!("$ ");
-        io::stdout().flush().unwrap();
 
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).unwrap();
+    let mut rl = Editor::new().unwrap();
+
+    rl.set_helper(Some(MyHelper));
+    loop {
+        let input = rl.readline("$ ").unwrap();
         let mut command = input.trim();
         let mut remainder = "";
 
