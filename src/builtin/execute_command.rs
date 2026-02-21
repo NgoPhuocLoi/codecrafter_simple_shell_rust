@@ -55,7 +55,7 @@ impl From<&String> for OutputCode {
     }
 }
 
-pub fn execute_command(command: &str, args: Vec<String>) {
+pub fn execute_command(command: &str, args: &Vec<String>) {
     match find_executable_path(command) {
         Some(_) => {
             let mut arg_list = &args[..];
