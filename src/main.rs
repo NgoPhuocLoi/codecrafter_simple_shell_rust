@@ -38,12 +38,13 @@ impl Completer for MyHelper {
             }
         }
 
-        if let Some(command_in_path) = find_executable_path_like(&line[..pos]) {
-            let file_name = command_in_path.file_name().unwrap().to_str().unwrap();
-            candidates.push(Pair {
-                display: format!("{file_name} "),
-                replacement: format!("{file_name} "),
-            })
+        if let Ok(Some(command_in_path)) = find_executable_path_like(&line[..pos]) {
+            if let Some(file_name) = command_in_path.file_name().and_then(|name| name.to_str()) {
+                candidates.push(Pair {
+                    display: format!("{file_name} "),
+                    replacement: format!("{file_name} "),
+                })
+            }
         }
 
         Ok((0, candidates))

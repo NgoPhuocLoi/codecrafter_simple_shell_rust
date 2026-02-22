@@ -57,7 +57,7 @@ impl From<&String> for OutputCode {
 
 pub fn execute_command(command: &str, args: &Vec<String>) {
     match find_executable_path(command) {
-        Some(_) => {
+        Ok(Some(_)) => {
             let mut arg_list = &args[..];
             let mut output_codes: Vec<OutputCode> = Vec::new();
             let mut output_code_indices: Vec<usize> = Vec::new();
@@ -141,8 +141,11 @@ pub fn execute_command(command: &str, args: &Vec<String>) {
                 io::stderr().write_all(&output.stderr).unwrap();
             }
         }
-        None => {
+        Ok(None) => {
             println!("{}: not found", command);
+        }
+        Err(e) => {
+            eprintln!("Error searching for command: {}", e);
         }
     }
 }
