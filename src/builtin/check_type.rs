@@ -12,6 +12,45 @@ fn is_command_at_path(command: &str, path: &Path) -> bool {
     false
 }
 
+fn is_command_like_path(command: &str, path: &Path) -> bool {
+    if !path.is_executable() {
+        return false;
+    }
+    let is_start_with_command = path
+        .file_name()
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .starts_with(command);
+    if is_start_with_command {
+        return true;
+    }
+    false
+}
+
+pub fn find_executable_path_like(command: &str) -> Option<PathBuf> {
+    if let Some(paths) = env::var_os("PATH") {
+        for path_buf in std::env::split_paths(&paths) {
+            let p = path_buf.as_path();
+            if p.is_file() && is_command_like_path(command, &p) {
+                return Some(path_buf);
+            }
+
+            if p.is_dir() {
+                for entry in fs::read_dir(p).unwrap() {
+                    let entry = entry.unwrap();
+                    let path = entry.path();
+
+                    if is_command_like_path(command, &path) {
+                        return Some(path);
+                    }
+                }
+            }
+        }
+    }
+    None
+}
+
 pub fn find_executable_path(command: &str) -> Option<PathBuf> {
     if let Some(paths) = env::var_os("PATH") {
         for path_buf in std::env::split_paths(&paths) {

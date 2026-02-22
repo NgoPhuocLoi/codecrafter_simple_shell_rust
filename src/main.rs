@@ -2,6 +2,7 @@ use rustyline::completion::{Completer, Pair};
 use rustyline::error::ReadlineError;
 use rustyline::{Context, Editor, Helper};
 
+use crate::builtin::check_type::find_executable_path_like;
 use crate::builtin::{check_type::check_type, execute_command::execute_command};
 use std::collections::HashSet;
 #[allow(unused_imports)]
@@ -36,6 +37,15 @@ impl Completer for MyHelper {
                 })
             }
         }
+
+        if let Some(command_in_path) = find_executable_path_like(&line[..pos]) {
+            let file_name = command_in_path.file_name().unwrap().to_str().unwrap();
+            candidates.push(Pair {
+                display: format!("{file_name} "),
+                replacement: format!("{file_name} "),
+            })
+        }
+
         Ok((0, candidates))
     }
 }
