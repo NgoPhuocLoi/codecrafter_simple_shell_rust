@@ -1,8 +1,8 @@
-use rustyline::completion::{Completer, Pair};
+use rustyline::completion::Completer;
 use rustyline::error::ReadlineError;
-use rustyline::{Context, Editor, Helper};
+use rustyline::{Config, Context, Editor, Helper};
 
-use crate::builtin::check_type::find_executable_path_like;
+use crate::builtin::check_type::fin_executable_paths_like;
 use crate::builtin::{check_type::check_type, execute_command::execute_command};
 use std::collections::HashSet;
 #[allow(unused_imports)]
@@ -17,8 +17,9 @@ impl rustyline::hint::Hinter for MyHelper {
 }
 impl rustyline::highlight::Highlighter for MyHelper {}
 impl Helper for MyHelper {}
+
 impl Completer for MyHelper {
-    type Candidate = Pair;
+    type Candidate = String;
 
     fn complete(
         &self, // FIXME should be `&mut self`
@@ -28,23 +29,24 @@ impl Completer for MyHelper {
     ) -> Result<(usize, Vec<Self::Candidate>), ReadlineError> {
         let commands = vec!["echo", "exit"];
         let mut candidates = vec![];
-
+        let input_command = &line[..pos].trim();
         for cmd in commands {
-            if cmd.starts_with(&line[..pos]) {
-                candidates.push(Pair {
-                    display: format!("{cmd} "),
-                    replacement: format!("{cmd} "),
-                })
+            if cmd.starts_with(input_command) {
+                candidates.push(format!("{cmd}"));
             }
         }
 
-        if let Ok(Some(command_in_path)) = find_executable_path_like(&line[..pos]) {
-            if let Some(file_name) = command_in_path.file_name().and_then(|name| name.to_str()) {
-                candidates.push(Pair {
-                    display: format!("{file_name} "),
-                    replacement: format!("{file_name} "),
-                })
+        if let Ok(commands_in_path) = fin_executable_paths_like(input_command) {
+            for cmd in commands_in_path {
+                let s = cmd.file_name().unwrap().to_str().unwrap();
+                candidates.push(format!("{s}"));
             }
+        }
+        candidates.sort();
+        candidates.dedup();
+
+        if candidates.len() == 1 {
+            candidates = vec![format!("{} ", &candidates[0])];
         }
 
         Ok((0, candidates))
@@ -52,7 +54,10 @@ impl Completer for MyHelper {
 }
 
 fn main() {
-    let mut rl = Editor::new().unwrap();
+    let config = Config::builder()
+        .completion_type(rustyline::CompletionType::List)
+        .build();
+    let mut rl = Editor::with_config(config).unwrap();
 
     rl.set_helper(Some(MyHelper));
     loop {

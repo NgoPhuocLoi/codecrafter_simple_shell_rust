@@ -80,14 +80,54 @@ where
     Ok(None)
 }
 
+fn find_multiple_in_path<F>(
+    command: &str,
+    matcher: F,
+) -> Result<Vec<PathBuf>, ExecutableSearchError>
+where
+    F: Fn(&str, &Path) -> bool,
+{
+    let mut result: Vec<PathBuf> = Vec::new();
+    let paths = match env::var_os("PATH") {
+        Some(paths) => paths,
+        None => return Ok(result),
+    };
+
+    for path_buf in std::env::split_paths(&paths) {
+        let p = path_buf.as_path();
+
+        if p.is_file() && matcher(command, p) {
+            result.push(p.to_path_buf());
+        }
+
+        if p.is_dir() {
+            let entries = fs::read_dir(p).map_err(|e| {
+                ExecutableSearchError::DirectoryReadError(format!("{}: {}", p.display(), e))
+            })?;
+
+            for entry in entries {
+                let entry = entry.map_err(|e| {
+                    ExecutableSearchError::PathEntryError(format!("{}: {}", p.display(), e))
+                })?;
+                let path = entry.path();
+
+                if matcher(command, &path) {
+                    result.push(path);
+                }
+            }
+        }
+    }
+
+    Ok(result)
+}
+
 /// Finds an executable in PATH that exactly matches the command name
 pub fn find_executable_path(command: &str) -> Result<Option<PathBuf>, ExecutableSearchError> {
     find_in_path(command, is_exact_match)
 }
 
-/// Finds an executable in PATH whose filename starts with the command prefix
-pub fn find_executable_path_like(command: &str) -> Result<Option<PathBuf>, ExecutableSearchError> {
-    find_in_path(command, is_prefix_match)
+pub fn fin_executable_paths_like(command: &str) -> Result<Vec<PathBuf>, ExecutableSearchError> {
+    find_multiple_in_path(command, is_prefix_match)
 }
 
 /// Checks the type of a command (builtin or executable) and prints the result
